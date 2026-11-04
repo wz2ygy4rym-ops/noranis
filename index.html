@@ -2644,17 +2644,59 @@ document.getElementById("quranResumeBtn").addEventListener("click",()=>{
 });
 
 /* الضغط على الآية لحفظ موضع القراءة */
-quranAyahs.addEventListener("click",async event=>{
+/* الضغط على الآية وحفظ الإنجاز اليومي */
+quranAyahs.addEventListener("click", async event => {
     const ayah = event.target.closest(".quran-ayah");
-    if(!ayah) return;
+    if (!ayah || !currentUser) return;
 
     const number = Number(ayah.dataset.ayah);
-    if(!number) return;
+    if (!number) return;
 
     currentAyahNumber = number;
-    await saveQuranProgress(currentSurahNumber,number);
-});
 
+    await saveQuranProgress(currentSurahNumber, number);
+
+    try {
+        const today = new Date().toLocaleDateString("en-CA");
+
+        const statsRef = doc(
+            db,
+            "users",
+            currentUser.uid,
+            "quranDailyStats",
+            today
+        );
+
+        const snapshot = await getDoc(statsRef);
+        const data = snapshot.exists() ? snapshot.data() : {};
+
+        const readAyahs = Array.isArray(data.readAyahs)
+            ? data.readAyahs
+            : [];
+
+        const ayahKey = currentSurahNumber + ":" + number;
+
+        if (readAyahs.includes(ayahKey)) return;
+
+        readAyahs.push(ayahKey);
+
+        dailyQuranAyahs = readAyahs.length;
+        dailyQuranDate = today;
+
+        await setDoc(statsRef, {
+            date: today,
+            readAyahs: readAyahs,
+            ayahs: dailyQuranAyahs,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+
+        document.getElementById("dailyQuranCount").textContent =
+            dailyQuranAyahs;
+
+    } catch (error) {
+        console.error("Saving daily Quran stats error:", error);
+    }
+});
 // ==========================================
 // نورانيس التنقل بين صفحات 
 // ==========================================

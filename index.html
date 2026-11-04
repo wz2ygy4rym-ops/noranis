@@ -2006,27 +2006,36 @@ function getTodayData(){
 function countDone(data){
     return prayerNames.filter(p=>data[p.id]===true).length;
 }
-
-function renderProgress(){
+    function renderProgress(){
     const done = countDone(getTodayData());
-    const percent = Math.round((done/5)*100);
-    const degrees = (done/5)*360;
+    const percent = Math.round((done / 5) * 100);
+    const degrees = (done / 5) * 360;
 
     let text;
-    if(done===0) text = "لم تسجل أي صلاة اليوم بعد";
-    else if(done===5) text = "ما شاء الله، أتممت صلوات اليوم 🌟";
-    else text = "صليت "+done+" من 5 صلوات اليوم";
 
-    [
-        ["progressCircle","progressNumber","progressBar","progressText"],
-        ["trackCircle","trackNumber","trackBar","trackText"]
-    ].forEach(([circleId,numberId,barId,textId])=>{
-        document.getElementById(circleId).style.background =
-            "conic-gradient(var(--gold) "+degrees+"deg, #eee9df 0deg)";
-        document.getElementById(numberId).textContent = percent+"%";
-        document.getElementById(barId).style.width = percent+"%";
-        document.getElementById(textId).textContent = text;
-    });
+    if(done === 0) text = "لم تسجل أي صلاة اليوم بعد";
+    else if(done === 5) text = "ما شاء الله، أتممت صلوات اليوم 🌟";
+    else text = "سجلت " + done + " من 5 صلوات اليوم";
+
+    // تحديث إنجازك اليومي
+    document.getElementById("progressCircle").style.background =
+        "conic-gradient(var(--gold) " + degrees + "deg, #eee9df 0deg)";
+
+    document.getElementById("progressNumber").textContent = percent + "%";
+    document.getElementById("progressBar").style.width = percent + "%";
+    document.getElementById("progressText").textContent = text;
+
+    // تحديث صفحة صلاتي
+    document.getElementById("trackCircle").style.background =
+        "conic-gradient(var(--gold) " + degrees + "deg, #eee9df 0deg)";
+
+    document.getElementById("trackNumber").textContent = percent + "%";
+    document.getElementById("trackBar").style.width = percent + "%";
+    document.getElementById("trackText").textContent = text;
+
+    // عدد الصلوات في إنجازك اليومي
+    document.getElementById("dailyPrayerCount").textContent =
+        done + " / 5";
 }
 
 function renderTracker(){

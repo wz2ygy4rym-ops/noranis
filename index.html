@@ -1515,9 +1515,11 @@ onAuthStateChanged(auth,async user=>{
         document.getElementById("profileName").textContent = displayName;
         document.getElementById("profileEmail").textContent = user.email || "";
 
-        loadPrayerTimes();
-        subscribePrayerLog();
-        loadQuranSurahs();
+       loadPrayerTimes();
+       subscribePrayerLog();
+       loadQuranSurahs();
+       loadQuranProgress();
+       loadDailyQuranStats();
     }else{
         currentUser = null;
 
@@ -2172,6 +2174,9 @@ const quranApi = "https://api.alquran.cloud/v1";
 let quranSurahs = [];
 let currentSurahNumber = 1;
 let currentAyahNumber = 1;
+// إحصائيات قراءة القرآن اليومية
+let dailyQuranAyahs = 0;
+let dailyQuranDate = new Date().toLocaleDateString("en-CA");
 let quranProgress = null;
 let quranLoadToken = 0;
 
@@ -2584,6 +2589,36 @@ async function loadQuranProgress(){
     }
 }
 
+    /* تحميل إحصائيات قراءة القرآن اليومية */
+async function loadDailyQuranStats(){
+    if(!currentUser) return;
+
+    const today = new Date().toLocaleDateString("en-CA");
+    dailyQuranDate = today;
+
+    try{
+        const statsRef = doc(
+            db,
+            "users",
+            currentUser.uid,
+            "quranDailyStats",
+            today
+        );
+
+        const snapshot = await getDoc(statsRef);
+
+        dailyQuranAyahs = snapshot.exists()
+            ? Number(snapshot.data().ayahs || 0)
+            : 0;
+
+        document.getElementById("dailyQuranCount").textContent =
+            dailyQuranAyahs;
+
+    }catch(error){
+        console.error("Loading daily Quran stats error:",error);
+    }
+}
+    
 /* زر متابعة القراءة */
 function updateQuranResume(){
     if(!quranProgress || !quranSurahs.length) return;

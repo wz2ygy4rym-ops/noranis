@@ -2717,6 +2717,7 @@ quranAyahs.addEventListener("click", async event => {
             ayahs: dailyQuranAyahs,
             updatedAt: serverTimestamp()
         }, { merge: true });
+        alert("تم حفظ إحصائيات القرآن بنجاح");
 
         document.getElementById("dailyQuranCount").textContent =
             dailyQuranAyahs;

@@ -760,4 +760,43 @@ body {
     );
     border-radius: 2px 2px 9px 9px;
 }
+/* إنجازك اليومي */
+.daily-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.daily-stat {
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #eee);
+    border-radius: 15px;
+    padding: 16px 8px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+}
+
+.daily-stat span {
+    font-size: 25px;
+}
+
+.daily-stat strong {
+    font-size: 20px;
+    color: var(--gold, #b58b45);
+}
+
+.daily-stat small {
+    font-size: 13px;
+    color: var(--text-color, #666);
+}
+
+@media (max-width: 350px) {
+    .daily-stats {
+        grid-template-columns: 1fr;
+    }
+}
 

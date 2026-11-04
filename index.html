@@ -2675,8 +2675,14 @@ document.getElementById("quranResumeBtn").addEventListener("click",()=>{
 /* الضغط على الآية وحفظ الإنجاز اليومي */
 quranAyahs.addEventListener("click", async event => {
     const ayah = event.target.closest(".quran-ayah");
-    if (!ayah || !currentUser) return;
+if (!ayah) return;
 
+if (!currentUser) {
+    alert("المستخدم غير مسجل الدخول");
+    return;
+}
+
+alert("تم التعرف على الآية والمستخدم");
     const number = Number(ayah.dataset.ayah);
     if (!number) return;
 

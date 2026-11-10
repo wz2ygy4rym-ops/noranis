@@ -1316,7 +1316,6 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
 import {
     getAuth,
     createUserWithEmailAndPassword,
@@ -1326,10 +1325,11 @@ import {
     sendPasswordResetEmail,
     onAuthStateChanged,
     signOut,
-    updateProfile
+    updateProfile,
+    setPersistence,
+    browserLocalPersistence
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
 import {
     getFirestore,
     doc,
@@ -1361,6 +1361,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 const auth = getAuth(app);
+    setPersistence(auth, browserLocalPersistence)
+    .catch(error => {
+        console.error("Auth persistence error:", error);
+    });
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 async function enablePrayerNotifications() {

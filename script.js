@@ -17,11 +17,19 @@ import {
   signOut,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
 import {
   getFirestore,
   doc,
+  getDoc,
   setDoc,
+  addDoc,
+  updateDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 

@@ -335,12 +335,12 @@ onAuthStateChanged(auth, async user => {
       $("userGreeting").textContent =
         `مرحبًا، ${user.displayName || "بك"}`;
     }
-
-    try {
-      await saveUserData(user);
-    } catch (error) {
-      console.error("تعذر حفظ بيانات المستخدم:", error);
-    }
+try {
+  await saveUserData(user);
+  loadMyRooms();
+} catch (error) {
+  console.error("تعذر حفظ بيانات المستخدم:", error);
+}
 
   } else {
     appScreen.classList.add("hidden");

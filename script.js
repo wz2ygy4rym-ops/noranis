@@ -326,6 +326,7 @@ if (forgotBtn) {
 // =====================================
 
 onAuthStateChanged(auth, async user => {
+  currentUser = user || null;
   if (user) {
     authScreen.classList.add("hidden");
     appScreen.classList.remove("hidden");
@@ -584,3 +585,142 @@ document.querySelectorAll(".nav-item").forEach(button => {
 
 updateDate();
 loadPrayerTimes();
+// =====================================
+// نظام الرومات - إنشاء وعرض الغرف
+// =====================================
+
+const newRoomName = $("newRoomName");
+const newRoomCode = $("newRoomCode");
+const createRoomBtn = $("createRoomBtn");
+const roomCreateStatus = $("roomCreateStatus");
+const myRoomsList = $("myRoomsList");
+
+// إنشاء غرفة جديدة
+if (createRoomBtn) {
+  createRoomBtn.addEventListener("click", async () => {
+
+    if (!currentUser) {
+      roomCreateStatus.textContent = "سجّل الدخول أولًا.";
+      return;
+    }
+
+    const name = newRoomName.value.trim();
+    const code = newRoomCode.value.trim().toUpperCase();
+
+    if (!name || !code) {
+      roomCreateStatus.textContent =
+        "اكتب اسم الغرفة وكود الدعوة.";
+      return;
+    }
+
+    if (code.length < 4) {
+      roomCreateStatus.textContent =
+        "كود الدعوة يجب أن يكون 4 أحرف أو أكثر.";
+      return;
+    }
+
+    createRoomBtn.disabled = true;
+    roomCreateStatus.textContent = "جاري إنشاء الغرفة...";
+
+    try {
+      // التأكد أن كود الدعوة غير مستخدم
+      const existingRooms = await getDocs(
+        query(
+          collection(db, "rooms"),
+          where("inviteCode", "==", code)
+        )
+      );
+
+      if (!existingRooms.empty) {
+        roomCreateStatus.textContent =
+          "كود الدعوة مستخدم بالفعل. اختر كودًا آخر.";
+        return;
+      }
+
+      // حفظ الغرفة
+      await addDoc(collection(db, "rooms"), {
+        name: name,
+        inviteCode: code,
+        ownerId: currentUser.uid,
+        ownerName: currentUser.displayName || "صاحب الغرفة",
+        memberIds: [currentUser.uid],
+        createdAt: serverTimestamp()
+      });
+
+      roomCreateStatus.textContent =
+        "تم إنشاء الغرفة بنجاح.";
+
+      newRoomName.value = "";
+      newRoomCode.value = "";
+
+      loadMyRooms();
+
+    } catch (error) {
+      console.error("Room creation error:", error);
+
+      roomCreateStatus.textContent =
+        "تعذر إنشاء الغرفة. تحقق من اتصال Firebase وصلاحيات Firestore.";
+
+    } finally {
+      createRoomBtn.disabled = false;
+    }
+  });
+}
+
+
+// تحميل الغرف الخاصة بالمستخدم
+function loadMyRooms() {
+
+  if (!currentUser || !myRoomsList) return;
+
+  if (roomsUnsubscribe) {
+    roomsUnsubscribe();
+  }
+
+  myRoomsList.textContent = "جاري تحميل الغرف...";
+
+  const roomsQuery = query(
+    collection(db, "rooms"),
+    where("memberIds", "array-contains", currentUser.uid)
+  );
+
+  roomsUnsubscribe = onSnapshot(
+    roomsQuery,
+    snapshot => {
+
+      if (snapshot.empty) {
+        myRoomsList.textContent =
+          "لم تنضم إلى أي غرفة حتى الآن.";
+        return;
+      }
+
+      myRoomsList.innerHTML = "";
+
+      snapshot.forEach(roomDocument => {
+
+        const room = roomDocument.data();
+
+        const roomCard = document.createElement("div");
+        roomCard.className = "feature-card";
+
+        const roomTitle = document.createElement("h3");
+        roomTitle.textContent = room.name || "غرفة بدون اسم";
+
+        const roomOwner = document.createElement("p");
+        roomOwner.textContent =
+          "صاحب الغرفة: " + (room.ownerName || "غير معروف");
+
+        roomCard.append(roomTitle, roomOwner);
+        myRoomsList.appendChild(roomCard);
+
+      });
+    },
+
+    error => {
+      console.error("Rooms loading error:", error);
+
+      myRoomsList.textContent =
+        "تعذر تحميل الغرف. تحقق من صلاحيات Firestore.";
+    }
+  );
+}

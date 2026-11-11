@@ -1381,11 +1381,12 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-setPersistence(auth, browserLocalPersistence)
-    .catch(error => {
-        console.error("Auth persistence error:", error);
-    });
-
+try {
+    await setPersistence(auth, browserLocalPersistence);
+    console.log("تم تفعيل حفظ تسجيل الدخول");
+} catch (error) {
+    console.error("Auth persistence error:", error);
+}
 // تهيئة الإشعارات
 let messaging = null;
 

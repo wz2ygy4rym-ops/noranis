@@ -72,7 +72,16 @@ const forgotBtn = $("forgotBtn");
 const authMessage = $("authMessage");
 
 let authMode = "signup";
+// =====================================
+// متغيرات نظام الرومات
+// =====================================
 
+let currentUser = null;
+let activeRoomId = null;
+
+let roomsUnsubscribe = null;
+let messagesUnsubscribe = null;
+let requestsUnsubscribe = null;
 
 // =====================================
 // رسائل تسجيل الدخول

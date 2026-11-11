@@ -1371,6 +1371,40 @@ async function enablePrayerNotifications() {
     const status = document.getElementById("notificationStatus");
     const button = document.getElementById("enablePrayerNotifications");
 
+/* عناصر ال// ==========================================
+// تهيئة Firebase
+// ==========================================
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+setPersistence(auth, browserLocalPersistence)
+    .catch(error => {
+        console.error("Auth persistence error:", error);
+    });
+
+// تهيئة الإشعارات
+let messaging = null;
+
+try {
+    messaging = getMessaging(app);
+} catch (error) {
+    console.warn("Messaging is not available:", error);
+}
+
+// ==========================================
+// تفعيل إشعارات الصلاة
+// ==========================================
+
+async function enablePrayerNotifications() {
+    const status = document.getElementById("notificationStatus");
+    const button = document.getElementById("enablePrayerNotifications");
+
+    if (!status || !button) return;
+
     try {
         if (!("Notification" in window)) {
             status.textContent = "المتصفح لا يدعم الإشعارات.";
@@ -1379,6 +1413,11 @@ async function enablePrayerNotifications() {
 
         if (!currentUser) {
             status.textContent = "سجّل الدخول أولاً.";
+            return;
+        }
+
+        if (!messaging) {
+            status.textContent = "الإشعارات غير مدعومة على هذا الجهاز.";
             return;
         }
 
@@ -1415,12 +1454,7 @@ async function enablePrayerNotifications() {
         console.error("Notification error:", error);
         status.textContent = "تعذر التفعيل. تحقق من إعدادات المتصفح.";
     }
-}
-
-document.getElementById("enablePrayerNotifications")
-    .addEventListener("click", enablePrayerNotifications);
-
-/* عناصر الصفحة */
+}صفحة */
 const authScreen = document.getElementById("authScreen");
 const appScreen = document.getElementById("appScreen");
 const authForm = document.getElementById("authForm");
